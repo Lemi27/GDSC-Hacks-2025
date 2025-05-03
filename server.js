@@ -82,7 +82,7 @@ app.get( '/signupform', (req, res) => {
   if (req.session.loggedin) {
     res.sendFile(path.join(__dirname + '/signup.html'));
   } else {
-    res.redirect( '/login');
+    res.redirect( 'static/login');
   }
   
 } );
@@ -122,30 +122,60 @@ app.post('/auth/signup', async (req, res) => {
   }
 });
 
-//Edit profile:
-app.get('/profile/edit', (req, res) => {
+app.get('/profile', (req, res) => {
   if (req.session.loggedin) {
-    res.sendFile(path.join(__dirname, 'edit-profile.html'));
+    res.sendFile(path.join(__dirname, '/static/home.html'));  // Or wherever your profile page is located
   } else {
     res.redirect('/login');
   }
 });
 
+
+//Edit profile:
+app.get('/profile/edit', (req, res) => {
+  if (req.session.loggedin) {
+    res.sendFile(path.join(__dirname, 'static/edit-profile.html'));
+  } else {
+    res.redirect('static/login');
+  }
+});
+
 app.post('/profile/update', async (req, res) => {
   if (!req.session.loggedin) {
-    return res.redirect('/login');
+    return res.redirect('static/login');
   }
 
   const profile = {
-    name: req.body.name,
-    age: parseInt(req.body.age),
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
+    phoneNumber: req.body.phoneNumber,
+    email: req.body.email,
     gender: req.body.gender,
-    bio: req.body.bio,
-    budget: parseInt(req.body.budget),
+    description: req.body.description,
     location: req.body.location,
+    socialMedia: {
+      linkedin: req.body.linkedin,
+      instagram: req.body.instagram
+    },
+    education: {
+      schoolName: req.body.schoolName,
+      programName: req.body.programName,
+      date: req.body.date,
+      description: req.body.educationDescription
+    },
     lifestyle: {
-      smoker: req.body.smoker === 'on',
-      nightOwl: req.body.nightOwl === 'on'
+      neatness: req.body.neatness,
+      noiseLevel: req.body.noiseLevel,
+      budget: req.body.budget,
+      other: req.body.other
+    },
+    interests: {
+      favouriteSports: req.body.favouriteSports,
+      hobbies: req.body.hobbies,
+      favouriteTvShows: req.body.favouriteTvShows,
+      favouriteMovies: req.body.favouriteMovies,
+      favouriteBooks: req.body.favouriteBooks,
+      favouriteFood: req.body.favouriteFood
     }
   };
 
@@ -153,7 +183,7 @@ app.post('/profile/update', async (req, res) => {
     const client = new MongoClient(mongoURL);
     await client.connect();
     const db = client.db(dbName);
-    const collection = db.collection('credentials');
+    const collection = db.collection(collectionProfile);
 
     await collection.updateOne(
       { username: req.session.username },
@@ -167,6 +197,10 @@ app.post('/profile/update', async (req, res) => {
     res.status(500).send('Error updating profile.');
   }
 });
+
+
+
+
 
 
 
