@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+        
+    <form action="http://localhost:3010/auth/signup" id="newSignUpForm" name="newSignUpForm">
+        Enter new username:
+        <input type="text" name="username" id="username"> <br>
+        Enter new password:
+        <input type="text" name="password"> <br>
+    
+    <input type="submit" value="Add User">
+  </form>
+  
+  <div id="inserUserFeedback">User Feedback</div>
+                
+    
+        
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js"> </script>
+
+        <!-- jQuery FORMAT -->
+        <script>
+  $(document).ready(function() {
+    $("#newSignUpForm").on("submit", function(event) {
+      event.preventDefault(); // Prevent the default form submission
+
+      var form = $(this),
+          username = $("#username").val(),
+          password = form.find("input[name='password']").val(),
+          url = form.attr("action");
+
+      // Send form data using AJAX
+      $.ajax({
+        type: "POST",
+        url: url,
+        data: { username: username, password: password },
+        
+        success: function(response) {
+            // Immediately redirect to login page after successful signup
+            window.location.href = "http://localhost:3010/login";
+          },
+        error: function(xhr, status, error) {
+          // Handle error
+          console.error("Error adding user:", error);
+          $("#inserUserFeedback").text("Error, check network connection");
+        }
+      });
+    });
+  });
+</script>
+  
+        
+        
+    </body>
+</html>
