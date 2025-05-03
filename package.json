@@ -1,0 +1,27 @@
+{
+  "name": "gdsc-hacks-2025",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Lemi27/GDSC-Hacks-2025.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Lemi27/GDSC-Hacks-2025/issues"
+  },
+  "homepage": "https://github.com/Lemi27/GDSC-Hacks-2025#readme",
+  "dependencies": {
+    "body-parser": "^2.2.0",
+    "express": "^5.1.0",
+    "express-session": "^1.18.1",
+    "mongodb": "^6.16.0"
+  }
+}
