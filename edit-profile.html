@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Edit Profile</title>
+        <link rel="stylesheet" href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+        <link href="css/edit-profile-styles.css" rel="stylesheet" />
+    </head>
+
+    <body>
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <h3>Edit Profile</h3>
+                    <hr>
+                    <form id="editProfileForm" method="POST" action="/profile/update">
+                        <div class="row mb-5">
+                            <!-- Contact details -->
+                            <div class="col-md-6">
+                                <label class="form-label">First Name *</label>
+                                <input type="text" class="form-control" id="first_name" name="firstName" value="">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Last Name *</label>
+                                <input type="text" class="form-control" id="last_name" name="lastName" value="">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Phone number *</label>
+                                <input type="text" class="form-control" id="phone_number" name="phoneNumber" value="">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Email *</label>
+                                <input type="email" class="form-control" id="email" name="email" value="">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Gender *</label>
+                                <input type="text" class="form-control" id="gender" name="gender" value="">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Description *</label>
+                                <input type="text" class="form-control" id="description" name="description" value="">
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label">Location *</label>
+                                <input type="text" class="form-control" id="location" name="location" value="">
+                            </div>
+                        </div>
+
+                        <div class="row mb-5">
+                            <!-- Social media -->
+                            <div class="col-md-6">
+                                <label class="form-label">Linkedin</label>
+                                <input type="text" class="form-control" id="linkedin" name="linkedin" value="http://www.linkedin.com/">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Instagram</label>
+                                <input type="text" class="form-control" id="instagram" name="instagram" value="http://www.instagram.com/">
+                            </div>
+                        </div>
+
+                        <div class="row mb-5">
+                            <!-- Education -->
+                            <div class="col-md-6">
+                                <label class="form-label">School Name *</label>
+                                <input type="text" class="form-control" id="school_name" name="schoolName" value="">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Program Name *</label>
+                                <input type="text" class="form-control" id="program_name" name="programName" value="">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Date *</label>
+                                <input type="text" class="form-control" id="date" name="date" value="">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Description</label>
+                                <input type="text" class="form-control" id="education_description" name="educationDescription" value="">
+                            </div>
+                        </div>
+
+                        <div class="row mb-5">
+                            <!-- Lifestyle & Compatibility -->
+                            <div class="col-md-6">
+                                <label class="form-label">Neatness *</label>
+                                <input type="text" class="form-control" id="neatness" name="neatness" value="">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Noise Level *</label>
+                                <input type="text" class="form-control" id="noise_level" name="noiseLevel" value="">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Budget *</label>
+                                <input type="text" class="form-control" id="budget" name="budget" value="">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Other</label>
+                                <input type="text" class="form-control" id="other" name="other" value="">
+                            </div>
+                        </div>
+
+                        <div class="row mb-5">
+                            <!-- Interests -->
+                            <div class="col-md-6">
+                                <label class="form-label">Favourite Sport(s)</label>
+                                <input type="text" class="form-control" id="sports" name="favouriteSports" value="">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Hobbies</label>
+                                <input type="text" class="form-control" id="hobbies" name="hobbies" value="">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Favourite TV Show(s)</label>
+                                <input type="text" class="form-control" id="tv_shows" name="favouriteTvShows" value="">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Movie(s)</label>
+                                <input type="text" class="form-control" id="movies" name="favouriteMovies" value="">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Favourite Book(s)</label>
+                                <input type="text" class="form-control" id="books" name="favouriteBooks" value="">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Favourite Food/Cuisine(s)</label>
+                                <input type="text" class="form-control" id="food" name="favouriteFood" value="">
+                            </div>
+                        </div>
+
+                        <!-- Submit button -->
+                        <div class="gap-3 d-md-flex justify-content-md-end text-center">
+                            <button type="button" class="btn btn-danger btn-lg">Cancel</button>
+                            <button type="submit" class="btn btn-primary btn-lg">Update profile</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+        <script>
+          $(document).ready(function() {
+            $("#editProfileForm").on("submit", function(event) {
+              event.preventDefault(); // Prevent the default form submission
+
+              var form = $(this),
+                  first_name = $("#first_name").val(),
+                  last_name = $("#last_name").val(),
+                  phone_number = $("#phone_number").val(),
+                  email = $("#email").val(),
+                  gender = $("#gender").val(),
+                  description = $("#description").val(),
+                  location = $("#location").val(),
+                  linkedin = $("#linkedin").val(),
+                  instagram = $("#instagram").val(),
+                  school_name = $("#school_name").val(),
+                  program_name = $("#program_name").val(),
+                  date = $("#date").val(),
+                  interests = {
+                    favouriteSports: $("#sports").val(),
+                    hobbies: $("#hobbies").val(),
+                    favouriteTvShows: $("#tv_shows").val(),
+                    favouriteMovies: $("#movies").val(),
+                    favouriteBooks: $("#books").val(),
+                    favouriteFood: $("#food").val()
+                  },
+                  url = form.attr("action");
+
+              // Send form data using AJAX
+              $.ajax({
+                type: "POST",
+                url: url,
+                data: {
+                        firstName: $("#first_name").val(),
+                        lastName: $("#last_name").val(),
+                        phoneNumber: $("#phone_number").val(),
+                        email: $("#email").val(),
+                        gender: $("#gender").val(),
+                        description: $("#description").val(),
+                        location: $("#location").val(),
+
+                        linkedin: $("#linkedin").val(),
+                        instagram: $("#instagram").val(),
+
+                        schoolName: $("#school_name").val(),
+                        programName: $("#program_name").val(),
+                        date: $("#date").val(),
+                        educationDescription: $("#education_description").val(),
+
+                        neatness: $("#neatness").val(),
+                        noiseLevel: $("#noise_level").val(),
+                        budget: $("#budget").val(),
+                        other: $("#other").val(),
+
+                        favouriteSports: $("#sports").val(),
+                        hobbies: $("#hobbies").val(),
+                        favouriteTvShows: $("#tv_shows").val(),
+                        favouriteMovies: $("#movies").val(),
+                        favouriteBooks: $("#books").val(),
+                        favouriteFood: $("#food").val()
+                        },
+                success: function(response) {
+                  // Redirect after successful profile update
+                  window.location.href = "/profile"; // Or any other page
+                },
+                error: function(xhr, status, error) {
+                  console.error("Error updating profile:", error);
+                  alert("Error, please try again.");
+                }
+              });
+            });
+          });
+        </script>
+    </body>
+</html>
