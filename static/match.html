@@ -4,12 +4,30 @@
   <meta charset="UTF-8">
   <title>Find Your Match</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="css/home-styles.css" rel="stylesheet" />
   <style>
     body { font-family: Arial, sans-serif; margin: 2em; }
     #results { margin-top: 2em; white-space: pre-wrap; background: #f4f4f4; padding: 1em; border-radius: 8px; }
   </style>
 </head>
 <body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container px-5">
+      <a class="navbar-brand" href="home.html">Campus Connect</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" 
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+          <li class="nav-item"><a class="nav-link" href="home.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="view-profile.html">View Profile</a></li>
+          <li class="nav-item"><a class="nav-link" href="match.html">Match</a></li>
+          <li class="nav-item"><a class="nav-link" href="index.html">Logout</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
   <h1>Roommate Matching</h1>
   <p>Finding the best matches for you...</p>
   <div id="results">Loading...</div>
@@ -17,7 +35,15 @@
   <script>
     async function getMatches() {
       try {
-        const res = await fetch('/api/match');
+        const res = await fetch('/api/match', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            prompt: "Find compatible friends or roommates based on shared interests and lifestyles."
+          })
+        });
         const data = await res.json();
         if (data && data.candidates) {
           document.getElementById('results').textContent = data.candidates[0].content.parts[0].text;
