@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Find Your Match</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2em; }
+    #results { margin-top: 2em; white-space: pre-wrap; background: #f4f4f4; padding: 1em; border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <h1>Roommate Matching</h1>
+  <p>Finding the best matches for you...</p>
+  <div id="results">Loading...</div>
+
+  <script>
+    async function getMatches() {
+      try {
+        const res = await fetch('/api/match');
+        const data = await res.json();
+        if (data && data.candidates) {
+          document.getElementById('results').textContent = data.candidates[0].content.parts[0].text;
+        } else {
+          document.getElementById('results').textContent = 'No match result from Gemini.';
+        }
+      } catch (err) {
+        console.error(err);
+        document.getElementById('results').textContent = 'Error loading match results.';
+      }
+    }
+
+    getMatches();
+  </script>
+</body>
+</html>
