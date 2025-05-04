@@ -36,7 +36,7 @@ app.get('/login', (req, res) => {
 // Home page (protected)
 app.get('/home', (req, res) => {
   if (req.session.loggedin) {
-    res.sendFile(path.join(__dirname, 'static', 'home.html'));
+    res.sendFile(path.join(__dirname, 'static', 'view-profile.html'));
   } else {
     res.redirect('/');
   }
