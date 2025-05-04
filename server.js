@@ -3,9 +3,14 @@ const session = require('express-session');
 const bodyParser = require('body-parser');
 const path = require('path');
 const { MongoClient } = require('mongodb');
+const axios = require('axios');
 
 const app = express();
+const mongoURL = "mongodb://localhost:27017";
+const dbName = 'hackathon2025';
+const collectionProfile = 'credentials';
 
+// Middleware setup
 app.use(session({
   secret: 'secret',
   resave: true,
@@ -16,45 +21,39 @@ app.use(express.static(path.join(__dirname, 'static')));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-const mongoURL = "mongodb://localhost:27017";
-const dbName = 'hackathon2025';
-const collectionProfile = 'credentials';
-
-// Root URL shows the login page
+// Root login page
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'static/index.html'));
+  res.sendFile(path.join(__dirname, 'static', 'index.html'));
 });
 
-// Optional alias for /login that redirects to /
+// Alias for /login
 app.get('/login', (req, res) => {
   res.redirect('/');
 });
 
-// Protected home page route
+// Home page (protected)
 app.get('/home', (req, res) => {
   if (req.session.loggedin) {
-    res.sendFile(path.join(__dirname, 'static/home.html'));
+    res.sendFile(path.join(__dirname, 'static', 'home.html'));
   } else {
     res.redirect('/');
   }
 });
 
-// Handle login submission
+// Handle login
 app.post('/auth', async (req, res) => {
-  try {
-    const username = req.body.username;
-    const password = req.body.password;
+  const { username, password } = req.body;
 
+  try {
     const client = new MongoClient(mongoURL);
     await client.connect();
-
     const db = client.db(dbName);
     const collection = db.collection(collectionProfile);
 
-    const userResult = await collection.find({ username, password }).toArray();
-    client.close();
+    const user = await collection.findOne({ username, password });
+    await client.close();
 
-    if (userResult.length === 1) {
+    if (user) {
       req.session.loggedin = true;
       req.session.username = username;
       res.redirect('/home');
@@ -67,82 +66,69 @@ app.post('/auth', async (req, res) => {
   }
 });
 
-// Log out route
+// Log out
 app.get('/logout', (req, res) => {
-  if (req.session.loggedin) {
-    req.session.destroy();
+  req.session.destroy(() => {
     res.redirect('/');
-  } else {
-    res.send('You are not logged in');
-  }
+  });
 });
 
-//Routing to html
-app.get( '/signupform', (req, res) => {
-  if (req.session.loggedin) {
-    res.sendFile(path.join(__dirname + '/signup.html'));
-  } else {
-    res.redirect( 'static/login');
-  }
-  
-} );
+// Signup form
+app.get('/signupform', (req, res) => {
+  res.sendFile(path.join(__dirname, 'static', 'signup.html'));
+});
 
-//Create new user:
+// Create new user
 app.post('/auth/signup', async (req, res) => {
-  try {
-    console.log('Inside signup');
-    
-    // Extract user credentials from request body
-    const username = req.body.username;
-    const password = req.body.password;
-    
-    console.log({ username, password });
+  const { username, password } = req.body;
 
+  try {
     const client = new MongoClient(mongoURL);
     await client.connect();
-    console.log('Connected to db');
-    
-    const db = client.db(dbName);  //Access db
-    const collection = db.collection(collectionProfile); // Access credentials collection
+    const db = client.db(dbName);
+    const collection = db.collection(collectionProfile);
 
-    // Insert new user into MongoDB
+    const existing = await collection.findOne({ username });
+    if (existing) {
+      await client.close();
+      return res.status(409).send({ message: 'Username already exists.' });
+    }
+
     const result = await collection.insertOne({ username, password });
+    await client.close();
 
-    console.log(result);
-    console.log('User inserted into database');
-    
-    client.close();
-    
-    // Send success response
     res.send({ message: 'Account created successfully!', id: result.insertedId });
-
   } catch (err) {
-    console.error('Failed', err);
+    console.error('Signup failed', err);
     res.status(500).send('Internal server error');
   }
 });
 
+// Profile view
+
 app.get('/profile', (req, res) => {
+  console.log("Received profile insert request");
+
   if (req.session.loggedin) {
-    res.sendFile(path.join(__dirname, '/static/home.html'));  // Or wherever your profile page is located
+    res.sendFile(path.join(__dirname, 'static', 'home.html'));
   } else {
-    res.redirect('/login');
+    res.redirect('/');
   }
 });
 
-
-//Edit profile:
+// Profile edit form
 app.get('/profile/edit', (req, res) => {
   if (req.session.loggedin) {
-    res.sendFile(path.join(__dirname, 'static/edit-profile.html'));
+    res.sendFile(path.join(__dirname, 'static', 'edit-profile.html'));
   } else {
-    res.redirect('static/login');
+    res.redirect('/');
   }
 });
 
+// Update profile
 app.post('/profile/update', async (req, res) => {
   if (!req.session.loggedin) {
-    return res.redirect('static/login');
+    return res.redirect('/');
   }
 
   const profile = {
@@ -187,10 +173,10 @@ app.post('/profile/update', async (req, res) => {
 
     await collection.updateOne(
       { username: req.session.username },
-      { $set: { profile: profile } }
+      { $set: { profile } }
     );
 
-    client.close();
+    await client.close();
     res.send('Profile updated successfully!');
   } catch (err) {
     console.error(err);
@@ -198,8 +184,7 @@ app.post('/profile/update', async (req, res) => {
   }
 });
 
-
-
+// Fetch current user's profile data (API)
 app.get('/api/profile', async (req, res) => {
   if (!req.session.loggedin || !req.session.username) {
     return res.status(401).json({ error: 'Unauthorized' });
@@ -212,16 +197,62 @@ app.get('/api/profile', async (req, res) => {
     const collection = db.collection(collectionProfile);
     const user = await collection.findOne({ username: req.session.username });
 
+    await client.close();
+
     if (!user || !user.profile) {
-      res.status(404).json({ error: "Profile not found" });
-    } else {
-      res.json({ profile: user.profile });
+      return res.status(404).json({ error: "Profile not found" });
     }
 
-    client.close();
+    res.json({ profile: user.profile });
   } catch (err) {
     console.error('Error retrieving profile:', err);
     res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Gemini AI matchmaking
+app.post('/api/match', async (req, res) => {
+  try {
+    console.log("Received match request with prompt:", req.body);
+
+    const client = new MongoClient(mongoURL);
+    await client.connect();
+    const db = client.db(dbName);
+    const collection = db.collection(collectionProfile);
+
+    const allProfiles = await collection.find({ profile: { $exists: true } }).toArray();
+    await client.close();
+
+    console.log("Profiles found:", allProfiles.length); // ✅ Debugging
+
+    const profilesText = allProfiles.map(p => 
+      `${p.username}: ${JSON.stringify(p.profile)}`
+    ).join('\n\n');
+
+    const prompt = `
+User: ${req.body.prompt}
+
+Profiles:
+${profilesText}
+`;
+
+    const geminiApiKey = process.env.GEMINI_API_KEY;
+    if (!geminiApiKey) {
+      return res.status(500).json({ error: "Gemini API key is not configured" });
+    }
+    
+    const geminiRes = await axios.post(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`,
+      { contents: [{ parts: [{ text: prompt }] }] },
+      { headers: { 'Content-Type': 'application/json' } }
+    );
+
+    console.log("Gemini response:", geminiRes.data); 
+
+    res.json(geminiRes.data);
+  } catch (err) {
+    console.error("Error querying Gemini:", err);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
