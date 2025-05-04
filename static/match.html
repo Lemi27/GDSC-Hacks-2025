@@ -21,7 +21,6 @@
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
           <li class="nav-item"><a class="nav-link" href="view-profile.html">View Profile</a></li>
-          <li class="nav-item"><a class="nav-link" href="edit-profile.html">Edit Profile</a></li>
           <li class="nav-item"><a class="nav-link" href="match.html">Match</a></li>
           <li class="nav-item"><a class="nav-link" href="index.html">Logout</a></li>
         </ul>
@@ -39,9 +38,10 @@
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
+
           },
           body: JSON.stringify({
-            prompt: "Find compatible friends or roommates based on shared interests and lifestyles."
+            prompt: "Find compatible roommates for the user that is logged in and the rest of the database. Return the top 5 or less results."
           })
         });
         const data = await res.json();
