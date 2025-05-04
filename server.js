@@ -213,43 +213,53 @@ app.get('/api/profile', async (req, res) => {
 });
 
 // Gemini AI matchmaking
+// Gemini AI matchmaking
 app.post('/api/match', async (req, res) => {
   try {
-    console.log("Received match request with prompt:", req.body);
-
     const client = new MongoClient(mongoURL);
     await client.connect();
     const db = client.db(dbName);
     const collection = db.collection(collectionProfile);
 
-    const allProfiles = await collection.find({ profile: { $exists: true } }).toArray();
+    const currentUser = await collection.findOne({ username: req.session.username });
+    const otherProfiles = await collection.find({ 
+      username: { $ne: req.session.username },
+      profile: { $exists: true }
+    }).toArray();
+
     await client.close();
 
-    console.log("Profiles found:", allProfiles.length); // ✅ Debugging
+    if (!currentUser || !currentUser.profile) {
+      return res.status(404).json({ error: 'Current user profile not found' });
+    }
 
-    const profilesText = allProfiles.map(p => 
+    const currentUserText = `${currentUser.username}: ${JSON.stringify(currentUser.profile)}`;
+    const otherProfilesText = otherProfiles.map(p => 
       `${p.username}: ${JSON.stringify(p.profile)}`
     ).join('\n\n');
 
     const prompt = `
-User: ${req.body.prompt}
+You are a matchmaking assistant. The following is the current user's profile:
 
-Profiles:
-${profilesText}
-`;
+CURRENT USER:
+${currentUserText}
+
+Compare this profile with the following other profiles and return the top 3 most compatible matches. Do not show reasoning for users that do not match. Be clear and explain why each match was chosen based on shared interests, lifestyle, etc.
+
+OTHER USERS:
+${otherProfilesText}
+    `.trim();
 
     const geminiApiKey = process.env.GEMINI_API_KEY;
     if (!geminiApiKey) {
       return res.status(500).json({ error: "Gemini API key is not configured" });
     }
-    
+
     const geminiRes = await axios.post(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`,
       { contents: [{ parts: [{ text: prompt }] }] },
       { headers: { 'Content-Type': 'application/json' } }
     );
-
-    console.log("Gemini response:", geminiRes.data); 
 
     res.json(geminiRes.data);
   } catch (err) {
