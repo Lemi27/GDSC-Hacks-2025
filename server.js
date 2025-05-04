@@ -200,7 +200,30 @@ app.post('/profile/update', async (req, res) => {
 
 
 
+app.get('/api/profile', async (req, res) => {
+  if (!req.session.loggedin || !req.session.username) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
 
+  try {
+    const client = new MongoClient(mongoURL);
+    await client.connect();
+    const db = client.db(dbName);
+    const collection = db.collection(collectionProfile);
+    const user = await collection.findOne({ username: req.session.username });
+
+    if (!user || !user.profile) {
+      res.status(404).json({ error: "Profile not found" });
+    } else {
+      res.json({ profile: user.profile });
+    }
+
+    client.close();
+  } catch (err) {
+    console.error('Error retrieving profile:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
 
 
